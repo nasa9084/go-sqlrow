@@ -14,8 +14,6 @@ type testStruct struct {
 	Age  int
 }
 
-type NilStruct struct{}
-
 func getRow() *sql.Row {
 	db, err := sql.Open("sqlmock", "")
 	if err != nil {
