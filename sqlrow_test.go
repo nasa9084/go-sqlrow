@@ -49,6 +49,22 @@ func TestBinderStruct(t *testing.T) {
 	}
 }
 
+func TestBinderType(t *testing.T){
+	var tt testType
+	row := getRow(
+		[]string{"value"},
+		[]driver.Value{"something"},
+	)
+	if err := sqlrow.NewBinder(row).Bind(&tt); err != nil {
+		t.Errorf("err: %s", err)
+		return
+	}
+	if string(tt) != "something" {
+		t.Errorf(`"%s" != "something"`, string(tt))
+		return
+	}
+}
+
 func ExampleBinder() {
 	db, _ := sql.Open("mysql", "...")
 	row := db.QueryRow("SELECT * FROM ...")
