@@ -4,6 +4,9 @@ go:
   - 1.8.x
   - 1.9.x
 
+before_script:
+  - go get ./...
+
 script:
   - go vet
   - go test -v
