@@ -35,7 +35,6 @@ func TestBinderStruct(t *testing.T) {
 		[]string{"name", "age"},
 		[]driver.Value{"something", 20},
 	)
-	t.Log(row)
 	if err := sqlrow.NewBinder(row).Bind(&ts); err != nil {
 		t.Errorf("err: %s", err)
 		return
