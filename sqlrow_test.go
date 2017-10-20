@@ -46,3 +46,12 @@ func TestBinder(t *testing.T) {
 		return
 	}
 }
+
+func ExampleBinder() {
+	db, _ := sql.Open("mysql", "...")
+	row := db.QueryRow("SELECT * FROM ...")
+	var ts testStruct
+	if err := sqlrow.NewBinder(row).Bind(&ts); err != nil {
+		panic(err)
+	}
+}
