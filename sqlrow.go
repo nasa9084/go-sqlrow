@@ -14,6 +14,11 @@ const (
 	ErrMustPointer bindErr = `binding destination instance must be a pointer`
 )
 
+// Bind function for convenience
+func Bind(row *sql.Row, i interface{}) error {
+	return NewBinder(row).Bind(i)
+}
+
 // Binder binds sql row to golang type
 type Binder struct {
 	row *sql.Row
