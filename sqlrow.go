@@ -48,9 +48,12 @@ func (binder *Binder) Bind(i interface{}) error {
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	fi := make([]interface{}, t.NumField())
+	fi := []interface{}{}
 	for i := 0; i < t.NumField(); i++ {
-		fi[i] = v.Field(i).Addr().Interface()
+		if !v.Field(i).CanSet() {
+			continue
+		}
+		fi = append(fi, v.Field(i).Addr().Interface())
 	}
 
 	return binder.row.Scan(fi...)

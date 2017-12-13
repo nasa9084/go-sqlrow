@@ -16,6 +16,11 @@ type testStruct struct {
 	Age  int
 }
 
+type testStructWithUnexported struct {
+	Name string
+	age  int
+}
+
 func getRow(cols []string, vals []driver.Value) *sql.Row {
 	db, err := sql.Open("sqlmock", "")
 	if err != nil {
@@ -27,6 +32,22 @@ func getRow(cols []string, vals []driver.Value) *sql.Row {
 		sqlmock.ValuesList(vals),
 	)
 	return db.QueryRow("")
+}
+
+func TestBinderWithUnexported(t *testing.T) {
+	var ts testStructWithUnexported
+	row := getRow(
+		[]string{"name"},
+		[]driver.Value{"something"},
+	)
+	if err := sqlrow.NewBinder(row).Bind(&ts); err != nil {
+		t.Errorf("err: %s", err)
+		return
+	}
+	if ts.Name != "something" {
+		t.Errorf(`"%s" != "something"`, ts.Name)
+		return
+	}
 }
 
 func TestBinderStruct(t *testing.T) {
@@ -49,7 +70,7 @@ func TestBinderStruct(t *testing.T) {
 	}
 }
 
-func TestBinderType(t *testing.T){
+func TestBinderType(t *testing.T) {
 	var tt testType
 	row := getRow(
 		[]string{"value"},
