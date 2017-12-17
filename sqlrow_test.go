@@ -94,3 +94,37 @@ func ExampleBinder() {
 		panic(err)
 	}
 }
+
+type benchmarkStruct struct {
+	A string
+	B int
+	C float64
+	D bool
+}
+
+func BenchmarkBinder(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		row := getRow(
+			[]string{"a", "b", "c", "d"},
+			[]driver.Value{"something", 20, 100.1, true},
+		)
+		var bs benchmarkStruct
+		if err := sqlrow.NewBinder(row).Bind(&bs); err != nil {
+			panic(err)
+		}
+	}
+}
+
+func BenchmarkRawScan(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		row := getRow(
+			[]string{"a", "b", "c", "d"},
+			[]driver.Value{"something", 20, 100.1, true},
+		)
+		var bs benchmarkStruct
+		if err := row.Scan(&bs.A, &bs.B, &bs.C, &bs.D); err != nil {
+
+			panic(err)
+		}
+	}
+}
