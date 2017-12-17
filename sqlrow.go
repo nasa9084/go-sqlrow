@@ -1,7 +1,6 @@
 package sqlrow
 
 import (
-	"database/sql"
 	"reflect"
 )
 
@@ -14,20 +13,25 @@ const (
 	ErrMustPointer bindErr = `binding destination instance must be a pointer`
 )
 
+// Scanner is wrapper interface of type like *sql.Row.
+type Scanner interface {
+	Scan(...interface{}) error
+}
+
 // Bind function for convenience
-func Bind(row *sql.Row, i interface{}) error {
-	return NewBinder(row).Bind(i)
+func Bind(sc Scanner, i interface{}) error {
+	return NewBinder(sc).Bind(i)
 }
 
 // Binder binds sql row to golang type
 type Binder struct {
-	row *sql.Row
+	sc  Scanner
 	err error
 }
 
 // NewBinder returns a new Binder
-func NewBinder(row *sql.Row) *Binder {
-	return &Binder{row: row}
+func NewBinder(sc Scanner) *Binder {
+	return &Binder{sc: sc}
 }
 
 // Bind binds row to given instance
@@ -41,7 +45,7 @@ func (binder *Binder) Bind(i interface{}) error {
 	}
 	t = t.Elem()
 	if t.Kind() != reflect.Struct {
-		return binder.row.Scan(i)
+		return binder.sc.Scan(i)
 	}
 
 	v := reflect.ValueOf(i)
@@ -56,5 +60,5 @@ func (binder *Binder) Bind(i interface{}) error {
 		fi = append(fi, v.Field(i).Addr().Interface())
 	}
 
-	return binder.row.Scan(fi...)
+	return binder.sc.Scan(fi...)
 }
